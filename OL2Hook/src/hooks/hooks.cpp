@@ -20,19 +20,42 @@ static LRESULT WINAPI WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 break;
             case VK_F2:
                 Menu::bShowOverlay = !Menu::bShowOverlay;
+                if (Menu::OLCM) Menu::OLCM->OutlastPause(); //lookinput is not working so......
                 break;
         }
     }
-    static bool press = false;
+    static bool pressG = false;
     if (GetAsyncKeyState('G') & 0x8000) {
-        if (!press) {
-            press = true;
+        if (!pressG) {
+            pressG = true;
             if (Menu::OLCM)
                 Menu::OLCM->Ghost();
         }
     }
     else {
-        press = false;
+        pressG = false;
+    }
+    static bool pressT = false;
+    if (GetAsyncKeyState('T') & 0x8000) {
+        if (!pressT) {
+            pressT = true;
+            if (Menu::OLCM)
+                Menu::OLCM->ToggleFreeCamNoPause();
+        }
+    }
+    else {
+        pressT = false;
+    }
+    static bool pressY = false;
+    if (GetAsyncKeyState('Y') & 0x8000) {
+        if (!pressY) {
+            pressY = true;
+            if (Menu::OLCM)
+                Menu::OLCM->TeleportToFreeCam();
+        }
+    }
+    else {
+        pressY = false;
     }
     LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     if (Menu::bShowOverlay) {

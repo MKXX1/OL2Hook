@@ -9,6 +9,17 @@ namespace Menu {
         WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size( ), &strTo[0], size_needed, NULL, NULL);
         return strTo; // btw maybe my encode is broke string for imgui idk
     }
+
+    void SendCheatMessage(const wchar_t* message, bool& cheatState, bool& prevState) {
+        if (OLCM && cheatState && !prevState) {
+            OLCM->eventCheatMessage(message);
+        }
+        prevState = cheatState;
+    }
+    void SendCheatMessage(const wchar_t* message) {
+        if (OLCM) 
+            OLCM->eventCheatMessage(message);
+    }
     
     //bool IsInMainMenu() {
     //    return OLPC && OLPC->HUD && OLPC->HUD->eventIsMainMenuOpen(); LMAO IT ALSO CRASH
