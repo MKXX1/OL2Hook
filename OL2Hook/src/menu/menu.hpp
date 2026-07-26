@@ -14,9 +14,8 @@ namespace Menu {
     inline AOLHero* OLHero = nullptr;
     inline AOLGame* OLGame = nullptr;
     inline UOLCheatManager* OLCM = nullptr;
-    inline UOLUtils* OLUtils = nullptr; 
-
-    //Main
+  
+    // Main
     inline bool bRender = true;
     inline bool bShowOverlay = false;
     inline bool bNoLookInput = false;
@@ -31,9 +30,8 @@ namespace Menu {
     inline bool bInfStim = false;
 
 
-
+    // other
     inline bool Allow = false;
-
     static int skinSlot1 = 1;
     static int skinSlot2 = 1;
 

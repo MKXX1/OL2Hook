@@ -7,29 +7,37 @@ static ImGuiTextFilter filter;
 namespace Menu {
 
     void InitializeContext(HWND hwnd) {
-        if (ig::GetCurrentContext( ))
+        if (ig::GetCurrentContext())
             return;
 
-        ImGui::CreateContext( );
+        ImGui::CreateContext();
         ImGui_ImplWin32_Init(hwnd);
-        PURPLE( );
-        ImGuiIO& io = ImGui::GetIO( );
+        PURPLE();
+        ImGuiIO& io = ImGui::GetIO();
     }
 
     void Render() {
         if (!bRender)
             return;
+
+        /* i fixed almost all crashes, except for one whose cause is unclear
+            when go to pause menu UI doesnt appear                  */
         AWorldInfo* World = AWorldInfo::GetWorldInfo();
         UEngine* UEngine = UEngine::GetEngine();
         ImGuiIO& io = ImGui::GetIO();
+
         if (UEngine && UEngine->GamePlayers[0] && UEngine->GamePlayers[0]->Actor)
             OLPC = static_cast<AOLPlayerController*>(UEngine->GamePlayers[0]->Actor);
-        if (World && World->Game) 
+
+        if (World && World->Game)
             OLGame = static_cast<AOLGame*>(World->Game); // UOLUtils gives crashes sometimes with proccessevent
-        if (OLPC && OLPC->HeroPawn) 
+
+        if (OLPC && OLPC->HeroPawn)
             OLHero = OLPC->HeroPawn;
-        if (OLPC && OLPC->CheatManager) 
+
+        if (OLPC && OLPC->CheatManager)
             OLCM = static_cast<UOLCheatManager*>(OLPC->CheatManager); // or UOLCheatManager::GetCheatManager( ); idk
+
         if (bOverlay) {
             if (ig::Begin("Overlay", (bool*)true, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoDecoration)) {
                 ig::SetWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_FirstUseEver);
@@ -61,7 +69,7 @@ namespace Menu {
                     //  ig::Text("CP_Name %s", utf8_encode(UOLUtils::GetCheckpointName(UOLUtils::GetCheckpointIndex(OLGame->CurrentCheckpointName)).ToWideString( )).c_str( )); crash sometimes
                     ig::Text("CPstartWorldTime %.3f", OLGame->CPStartWorldTime);
                     ig::Text("BaseGame time %.3f", OLGame->BaseGameTime);
-                   // ig::Text("SegmentEndGameTime %.3f", OLGame->SegmentEndGameTime); always 0.0000 idk why
+                    // ig::Text("SegmentEndGameTime %.3f", OLGame->SegmentEndGameTime); always 0.0000 idk why
                     ig::Text("CurrentGameTime %.3f", OLGame->CurrentGameTime);
                     //  ig::Text("ChapterName %s", utf8_encode(UOLUtils::GetChapterName(OLGame->CurrentCheckpointName).ToWideString( )).c_str( )); crash sometimes
                 }
@@ -83,7 +91,7 @@ namespace Menu {
             ig::Separator();
             {
                 ig::Spacing();
-                
+
                 ig::Checkbox("Show Overlay", &bOverlay);
                 ig::Checkbox("Player Debug", &bPlayerdbg);
                 ig::Checkbox("Player Controller Debug", &bPCdbg);
@@ -109,7 +117,7 @@ namespace Menu {
                     if (ig::Button("RechargeNightVision", sz)) {
                         OLCM->RechargeNightVision();
                     }
-                    
+
                     ig::Text("Select blake Skin:");
                     ig::SliderInt("##Slot1", &skinSlot1, 1, 4, "Slot1: %d");
                     ig::SliderInt("##Slot2", &skinSlot2, 1, 4, "Slot2: %d");
