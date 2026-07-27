@@ -17,7 +17,7 @@ namespace Menu {
     }
 
     void Render() {
-        if (!bRender)
+        if (!bRender || !GNames || !GObjects)
             return;
 
         AWorldInfo* World = AWorldInfo::GetWorldInfo();
@@ -45,6 +45,9 @@ namespace Menu {
         if (OLEngine && OLEngine->MaxSmoothedFrameRate > 62)
             OLEngine->MaxSmoothedFrameRate = 62;
 
+        if (World && World->PawnList)
+            OLEnemy = static_cast<AOLEnemyPawn*>(World->PawnList);
+
        // bNoLookInput =  OLPC->eventIsLookInputIgnored();
 
         if (bOverlay) {
@@ -70,15 +73,22 @@ namespace Menu {
                     ig::Text("NumBandages: %d", OLPC->NumBandages);
                 }
 
+                //if (OLEnemy) {
+                //    OLEnemy->spaw
+                //}
+
                 //OLGame dbg
                 if (OLGame && OLHero && OLPC && bGamedbg) {
                     ig::Text("Difficulty: %d", OLGame->DifficultyMode);
-                    //  ig::Text("CP_Name %s", utf8_encode(UOLUtils::GetCheckpointName(UOLUtils::GetCheckpointIndex(OLGame->CurrentCheckpointName)).ToWideString( )).c_str( )); crash sometimes
+
+                    //ig::Text("CP_Name %s", UOLUtils::GetCheckpointName(UOLUtils::GetCheckpointIndex(OLGame->CurrentCheckpointName)).ToString().c_str()); //crash sometimes
+
                     ig::Text("CPstartWorldTime %.0f", OLGame->CPStartWorldTime);
                     ig::Text("BaseGame time %.0f", OLGame->BaseGameTime);
                     // ig::Text("SegmentEndGameTime %.3f", OLGame->SegmentEndGameTime); always 0.0000 idk why
                     ig::Text("CurrentGameTime %.0f", OLGame->CurrentGameTime);
-                    //  ig::Text("ChapterName %s", utf8_encode(UOLUtils::GetChapterName(OLGame->CurrentCheckpointName).ToWideString( )).c_str( )); crash sometimes
+
+                //    ig::Text("ChapterName %s", utf8_encode(UOLUtils::GetChapterName(OLGame->CurrentCheckpointName).ToWideString( )).c_str( )); //crash sometimes
                 }
                 ig::End();
             }
@@ -145,8 +155,11 @@ namespace Menu {
                     ig::Checkbox("Infinite Stamina", &bInfStim);
                     ig::Checkbox("Infinite Bandages", &binfbandage);
                     ig::Checkbox("Infinite Batteries", &binfbatteries);
+                    if (ig::Button("123",sz)) {
+                        test();
+                    }
                 }
-                if (ig::TreeNode("CP_LIST")) {
+                if (ig::TreeNode("CP_LIST")) { // UNSTABLE
                     auto* objects = UObject::GObjObjects();
                     if (!objects) {
                         ig::TreePop();
@@ -169,8 +182,8 @@ namespace Menu {
                             if (ig::Button(cpName.c_str(), sz)) {
                                 if (OLPC) {
                                     std::wstring wstr(cpName.begin(), cpName.end());
-                                    FString FString(wstr.c_str());
-                                    OLPC->StartNewGameAtCheckpoint(false, FString);
+                                   // FString FString(wstr.c_str());
+                                    OLPC->StartNewGameAtCheckpoint(wstr.c_str(), false);
                                     //     OLCM->cp(wstr.c_str());
                                 }
                             }
@@ -184,6 +197,7 @@ namespace Menu {
             ig::End();
         }
         
+
         // Cheat Msg (just funny)
         if (OLPC) {
             SendCheatMessage(L"Infinite Bandages", binfbandage, Bandage);
@@ -209,6 +223,9 @@ namespace Menu {
 
         if (bNoCPK)
             NOCPK();
+
+        //if (GOI)
+        //    test();
         
     }
     // VOIDS
@@ -254,6 +271,7 @@ namespace Menu {
             Batteries = 1;
         else
             Batteries = 1;
+
         OLPC->NumBatteries = Batteries;
     }
 
@@ -265,6 +283,26 @@ namespace Menu {
 
             doors->bLocked = FALSE;
         }
+    }
+
+    void test() {
+        auto ACTOR = static_cast<AOLEnemyMartha*>(OLPC->Spawn(AOLEnemyMartha::StaticClass(),
+            NULL, NULL,
+            OLHero->EyeLocation,
+            OLHero->EyeRotation,
+            NULL, true, true));
+        auto BOT = static_cast<AOLBot*>(OLPC->Spawn(AOLBot::StaticClass(),
+            NULL, NULL,
+            FVector(0,0,0),
+            FRotator(0.0,0),
+            NULL, true, true));
+       // if (BOT && BOT->Name.ToString().empty());                              //0xFFFFFFFFFFFFFB5B
+        if (BOT && BOT->EnemyPawn);
+          //  BOT->EnemyPawn = static_cast<AOLEnemyPawn*>(ACTOR);              //0xFFFFFFFFFFFFFB5B
+        
+       // BOT->Possess(ACTOR, false);
+       //BOTcast->SightComponent->CanSeeTarget = TRUE;
+       //BOTcast->SightComponent->CouldSeeTarget = TRUE;
     }
 
     void destroyallEnemyPawn() {
@@ -284,7 +322,6 @@ namespace Menu {
         //    OLPawn->Destroy();
         //}
         OLCM->KillAllEnemies();
-        OLCM->CleanupAfterKillAll();
     }
 
     void NOCPK() {

@@ -13,6 +13,7 @@ namespace Menu {
     void InfiniteBatteries();
     void destroyallEnemyPawn();
     void prikol();
+    void test();
 
     // ptrs
     inline AOLPlayerController* OLPC = nullptr;
@@ -21,6 +22,7 @@ namespace Menu {
     inline UOLWorld* OLWorld = nullptr;
     inline UOLEngine* OLEngine = nullptr;
     inline UOLCheatManager* OLCM = nullptr;
+    inline AOLEnemyPawn* OLEnemy = nullptr;
   
     // Main
     inline bool bRender = true;
@@ -41,6 +43,7 @@ namespace Menu {
 
     // other
     inline bool Allow = false;
+    inline bool GOI = false;
     inline bool NKPI = false;
     static int skinSlot1 = 1;
     static int skinSlot2 = 1;

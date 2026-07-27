@@ -2003,7 +2003,7 @@ void AOLPlayerController::eventClientCommitMapChange()
 // uint32_t                       bSaveToDisk                    (CPF_Parm)
 // class FString                  CheckpointStr                  (CPF_Const | CPF_Parm | CPF_OutParm | CPF_NeedCtorLink)
 
-void AOLPlayerController::StartNewGameAtCheckpoint(bool bSaveToDisk, class FString& CheckpointStr)
+void AOLPlayerController::StartNewGameAtCheckpoint(const class FString& CheckpointStr, bool bSaveToDisk)
 {
 	static UFunction* uFnStartNewGameAtCheckpoint = nullptr;
 
@@ -2019,7 +2019,7 @@ void AOLPlayerController::StartNewGameAtCheckpoint(bool bSaveToDisk, class FStri
 
 	this->ProcessEvent(uFnStartNewGameAtCheckpoint, &StartNewGameAtCheckpoint_Params, nullptr);
 
-	memcpy_s(&CheckpointStr, sizeof(CheckpointStr), &StartNewGameAtCheckpoint_Params.CheckpointStr, sizeof(StartNewGameAtCheckpoint_Params.CheckpointStr));
+//	memcpy_s(&CheckpointStr, sizeof(CheckpointStr), &StartNewGameAtCheckpoint_Params.CheckpointStr, sizeof(StartNewGameAtCheckpoint_Params.CheckpointStr));
 }
 
 // Function OLGame.OLPlayerController.ApplyCheckpointRecord

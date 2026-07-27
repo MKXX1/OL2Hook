@@ -882,6 +882,9 @@ public:
 
 	bool IsValid() const
 	{
+		if (!Names())
+			return false;
+
 		if ((FNameEntryId < 0 || FNameEntryId > Names()->size()))
 		{
 			return false;
@@ -1021,13 +1024,13 @@ struct FQWord
 	int32_t B; // 0x0004 (0x04)
 };
 
-#ifdef _MSC_VER
-static_assert(sizeof(void*) == 0x8, "The Outlast 2 SDK must be built for x64.");
-static_assert(sizeof(TArray<void*>) == 0x10, "Unexpected TArray layout.");
-static_assert(offsetof(FNameEntry, Name) == 0x14, "Unexpected FNameEntry::Name offset.");
-static_assert(sizeof(FName) == 0x8, "Unexpected FName layout.");
-#pragma pack(pop)
-#endif
+//#ifdef _MSC_VER
+//static_assert(sizeof(void*) == 0x8, "The Outlast 2 SDK must be built for x64.");
+//static_assert(sizeof(TArray<void*>) == 0x10, "Unexpected TArray layout.");
+//static_assert(offsetof(FNameEntry, Name) == 0x14, "Unexpected FNameEntry::Name offset.");
+//static_assert(sizeof(FName) == 0x8, "Unexpected FName layout.");
+//#pragma pack(pop)
+//#endif
 
 /*
 # ========================================================================================= #

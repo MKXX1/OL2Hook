@@ -4163,7 +4163,7 @@ public:
 	void SaveBeforeQuitting();
 	void eventClientCommitMapChangeNoOverlay();
 	void eventClientCommitMapChange();
-	void StartNewGameAtCheckpoint(bool bSaveToDisk, class FString& outCheckpointStr);
+	void StartNewGameAtCheckpoint(const class FString& outCheckpointStr, bool bSaveToDisk);
 	void ApplyCheckpointRecord(struct AOLPlayerController_FCheckpointRecord& outRecord);
 	void GetSaveGameNameFromRecord(struct AOLPlayerController_FCheckpointRecord& outRecord, class FString& outSaveGameName);
 	void CreateCheckpointRecord(struct AOLPlayerController_FCheckpointRecord& outRecord);
