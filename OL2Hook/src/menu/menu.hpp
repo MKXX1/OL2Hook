@@ -14,6 +14,8 @@ namespace Menu {
     void destroyallEnemyPawn();
     void prikol();
     void test();
+    void BrainDeadEnemies();
+    void ExampleW2S();
 
     // ptrs
     inline AOLPlayerController* OLPC = nullptr;
@@ -23,10 +25,13 @@ namespace Menu {
     inline UOLEngine* OLEngine = nullptr;
     inline UOLCheatManager* OLCM = nullptr;
     inline AOLEnemyPawn* OLEnemy = nullptr;
+    inline UOLFXManager* FXManager = nullptr;
+
   
     // Main
     inline bool bRender = true;
     inline bool bShowOverlay = false;
+    inline bool bShowVoiceManager = false;
     inline bool bNoLookInput = false;
     
 
@@ -38,12 +43,15 @@ namespace Menu {
     inline bool bGamedbg = false;
     inline bool bInfStim = false;
     inline bool bNoCPK = false;
+    inline bool bNoAi = false;
     inline bool binfbandage = false;
     inline bool binfbatteries = false;
+    inline bool bMyopia = false;
 
     // other
+    inline bool W2S = false;
+    inline bool NVClear = false;
     inline bool Allow = false;
-    inline bool GOI = false;
     inline bool NKPI = false;
     static int skinSlot1 = 1;
     static int skinSlot2 = 1;

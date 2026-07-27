@@ -1,4 +1,5 @@
 #include "MenuUtils.hpp"
+namespace ig = ImGui;
 
 namespace Menu {
     std::string utf8_encode(const std::wstring& wstr) {
@@ -16,13 +17,117 @@ namespace Menu {
         }
         prevState = cheatState;
     }
-    void SendCheatMessage(const wchar_t* message) {
-        if (OLCM) 
-            OLCM->eventCheatMessage(message);
+
+    void SendCheatMessage(const wchar_t* msg, ...)
+    {
+        if (!OLCM)
+            return;
+
+        wchar_t buffer[1024];
+
+        va_list args;
+        va_start(args, msg);
+        vswprintf_s(buffer, _countof(buffer), msg, args);
+        va_end(args);
+
+        OLCM->eventCheatMessage(buffer);
     }
-    
-    //bool IsInMainMenu() {
-    //    return OLPC && OLPC->HUD && OLPC->HUD->eventIsMainMenuOpen(); LMAO IT ALSO CRASH
+
+    void AddText(std::string Text, FVector2D Position, bool WithIcon) {
+        ig::GetBackgroundDrawList()->AddText(ImVec2(Position.X - (ig::CalcTextSize((const char*)Text.c_str()).x / 2), Position.Y + (0)), ig::ColorConvertFloat4ToU32(ImVec4(1,1,1,1)), (const char*)Text.c_str());
+    }
+
+    bool WorldToScreen(APlayerController* pPC, const FVector& WorldLocation, FVector2D& ScreenLocation)
+    { /*
+        if (!pPC)
+            return false;
+
+        ACamera* pCamera = pPC->PlayerCamera;
+        if (!pCamera)
+            return false;
+
+        FVector ViewLocation = pCamera->Location;
+        FRotator ViewRotation = pCamera->Rotation;
+
+        FVector AxisX, AxisY, AxisZ;
+        GetAxes(ViewRotation, AxisX, AxisY, AxisZ);
+
+        FVector Delta = SubtractVectors(WorldLocation, ViewLocation);
+
+        FVector Transformed;
+        Transformed.X = DotProduct(Delta, AxisY);
+        Transformed.Y = DotProduct(Delta, AxisZ);
+        Transformed.Z = DotProduct(Delta, AxisX);
+
+        if (Transformed.Z < 1.0f)
+            return false;
+
+        float FOVAngle = pCamera->GetFOVAngle();
+        if (FOVAngle < 1.0f)
+            FOVAngle = 90.0f;
+
+        float ScreenWidth = ImGui::GetIO().DisplaySize.x;
+        float ScreenHeight = ImGui::GetIO().DisplaySize.y;
+
+        if (ScreenWidth <= 0 || ScreenHeight <= 0)
+            return false;
+
+ 
+        float FOVRadians = FOVAngle * CONST_Pi / 360.0f;
+        float tanFOV = tanf(FOVRadians);
+        if (tanFOV < 0.001f)
+            tanFOV = 0.001f;
+
+        float CenterX = ScreenWidth / 2.0f;
+        float CenterY = ScreenHeight / 2.0f;
+
+        float ScreenX = CenterX + (Transformed.X * (CenterX / tanFOV)) / Transformed.Z;
+        float ScreenY = CenterY - (Transformed.Y * (CenterX / tanFOV)) / Transformed.Z;
+
+        ScreenLocation.X = ScreenX;
+        ScreenLocation.Y = ScreenY;
+
+        return (ScreenX >= 0 && ScreenX <= ScreenWidth &&
+            ScreenY >= 0 && ScreenY <= ScreenHeight); */
+        return false;
+        // shit
+    }
+
+    bool IsInMainMenu() {
+        return OLPC && OLPC->HUD && OLPC->HUD->eventIsMainMenuOpen();
+    }
+
+    bool IsInPauseMenu() {
+        return OLPC && OLPC->HUD && OLPC->HUD->eventIsInPauseMenu();
+    }
+
+    //bool IsValid(UObject* obj)
+    //{
+    //    if (!obj)
+    //    {
+    //        LOG();
+    //        return FALSE;
+    //    }
+    //    else if (!UObject::GObjObjects().IsValidIndex(GetIndex()))
+    //    {
+    //        LOG(NAME_Warning, TEXT("Invalid object index %i"), GetIndex());
+    //        LOG(NAME_Warning, TEXT("This is: %s"), *GetFullName());
+    //        return FALSE;
+    //    }
+    //    else if (GObjObjects(GetIndex()) == NULL)
+    //    {
+    //        LOG(NAME_Warning, TEXT("Empty slot"));
+    //        LOG(NAME_Warning, TEXT("This is: %s"), *GetFullName());
+    //        return FALSE;
+    //    }
+    //    else if (GObjObjects(GetIndex()) != obj)
+    //    {
+    //        LOG(NAME_Warning, TEXT("Other object in slot"));
+    //        LOG(NAME_Warning, TEXT("This is: %s"), *GetFullName());
+    //        LOG(NAME_Warning, TEXT("Other is: %s"), *GObjObjects(GetIndex())->GetFullName());
+    //        return FALSE;
+    //    }
+    //    else return TRUE;
     //}
 
     void PURPLE( ) {

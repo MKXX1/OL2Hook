@@ -20,7 +20,8 @@ static LRESULT WINAPI WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 break;
             case VK_F2:
                 Menu::bShowOverlay = !Menu::bShowOverlay;
-                if (Menu::OLCM) Menu::OLCM->OutlastPause(); //lookinput is not working so......
+                if (Menu::OLCM && !Menu::IsInPauseMenu) 
+                    Menu::OLCM->OutlastPause(); //lookinput is not working so......
                 break;
         }
     }
@@ -28,7 +29,7 @@ static LRESULT WINAPI WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
     if (GetAsyncKeyState('G') & 0x8000) {
         if (!pressG) {
             pressG = true;
-            if (Menu::OLCM)
+            if (Menu::OLCM && Menu::OLPC && Menu::OLHero)
                 Menu::OLCM->Ghost();
         }
     }
@@ -39,7 +40,7 @@ static LRESULT WINAPI WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
     if (GetAsyncKeyState('T') & 0x8000) {
         if (!pressT) {
             pressT = true;
-            if (Menu::OLCM)
+            if (Menu::OLCM && Menu::OLPC && Menu::OLHero)
                 Menu::OLCM->ToggleFreeCamNoPause();
         }
     }
@@ -50,7 +51,7 @@ static LRESULT WINAPI WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
     if (GetAsyncKeyState('Y') & 0x8000) {
         if (!pressY) {
             pressY = true;
-            if (Menu::OLCM)
+            if (Menu::OLCM && Menu::OLPC && Menu::OLHero)
                 Menu::OLCM->TeleportToFreeCam();
         }
     }
