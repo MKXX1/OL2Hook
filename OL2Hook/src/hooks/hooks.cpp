@@ -11,18 +11,22 @@ static WNDPROC oWndProc;
 static LRESULT WINAPI WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     if (uMsg == WM_KEYDOWN) {
         switch (wParam) {
-            case VK_INSERT:
-                Menu::bRender = !Menu::bRender;
-                break;
-            case VK_END:
-                H::bShuttingDown = true;
-                U::UnloadDLL( );
-                break;
-            case VK_F2:
-                Menu::bShowOverlay = !Menu::bShowOverlay;
-                if (Menu::OLCM && !Menu::IsInPauseMenu) 
-                    Menu::OLCM->OutlastPause(); //lookinput is not working so......
-                break;
+        case VK_INSERT:
+            Menu::bRender = !Menu::bRender;
+            return 0;
+            break;
+        case VK_END:
+            H::bShuttingDown = true;
+            U::UnloadDLL();
+            return 0;
+            break;
+        case VK_F2:
+            Menu::bShowOverlay = !Menu::bShowOverlay;
+            if (Menu::OLCM && !Menu::IsInPauseMenu()) {
+                Menu::OLCM->OutlastPause(); //lookinput is not working so......
+            }
+            return 0;
+            break;
         }
     }
     static bool pressG = false;
@@ -82,17 +86,13 @@ namespace Hooks {
             FreeConsole( );
         }
 #endif
-
-        oWndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(
-            g_hWindow,
-            GWLP_WNDPROC,
-            reinterpret_cast<LONG_PTR>(WndProc)));
+        
+        oWndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(g_hWindow, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WndProc)));
     }
 
     void Free( ) {
         if (oWndProc) {
             SetWindowLongPtr(g_hWindow, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(oWndProc));
-            oWndProc = NULL;
         }
 
 

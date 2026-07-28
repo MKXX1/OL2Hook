@@ -49,6 +49,8 @@ namespace Menu {
     inline bool bMyopia = false;
 
     // other
+    static int viewModeIndex = 0;
+    inline const char* viewModes[] = { "Lit", "Unlit", "Wireframe", "DetailLight", "ShaderComplexity" };
     inline bool W2S = false;
     inline bool NVClear = false;
     inline bool Allow = false;

@@ -1,4 +1,4 @@
-#include "menu.hpp"
+#include "Menu.hpp"
 
 namespace ig = ImGui;
 
@@ -17,7 +17,7 @@ namespace Menu {
     }
 
     void Render() {
-        if (!bRender || !GNames || !GObjects)
+        if (!bRender || !GObjects || !GNames)
             return;
 
         AWorldInfo* World = AWorldInfo::GetWorldInfo();
@@ -46,20 +46,21 @@ namespace Menu {
         if (OLEngine && OLEngine->MaxSmoothedFrameRate > 62)
             OLEngine->MaxSmoothedFrameRate = 62;
 
-        if (World && World->PawnList)
-            OLEnemy = static_cast<AOLEnemyPawn*>(World->PawnList);
+        //if (World && World->PawnList)
+        //    OLEnemy = static_cast<AOLEnemyPawn*>(World->PawnList);
 
        // bNoLookInput =  OLPC->eventIsLookInputIgnored();
 
 
         // DEBUG VO
+        
         if (bShowVoiceManager && !IsInMainMenu()) {
             if (OLGame && OLGame->VoiceManager)
             {
                 auto* VoiceManager = OLGame->VoiceManager;
                 ig::Begin("DebugVO", (bool*)true, ImGuiWindowFlags_None);
-                ig::SetWindowSize(ImVec2(800, 400), ImGuiCond_FirstUseEver);
-                ig::SetWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
+                ig::SetWindowSize(ImVec2(743, 400), ImGuiCond_FirstUseEver);
+                ig::SetWindowPos(ImVec2(1088, 28), ImGuiCond_FirstUseEver);
 
                 if (ig::BeginTable("VOEventLog", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY))
                 {
@@ -167,6 +168,376 @@ namespace Menu {
                 ig::End();
             }
         }
+        /*if (bShowVoiceManager && !IsInMainMenu()) {
+            AActor* listener = OLHero;
+            if (!listener)
+                return;
+
+            auto* envmang = UOLSoundEnvironmentManager::GetSoundEnvManager();
+            if (!envmang)
+                return;
+
+            TArray<UOLSoundEmitter*> SortedSources = envmang->ActiveSources;
+
+            int nbStatic = 0;
+            int nbDynamic = 0;
+
+            for (int i = 0; i < SortedSources.size(); i++)
+            {
+                UOLSoundEmitter* sndSrc = SortedSources[i];
+                if (!sndSrc || !sndSrc->Actor)
+                    continue;
+
+                if (sndSrc->Actor == listener)
+                    continue;
+
+                if (sndSrc->bActive)
+                {
+                    if (sndSrc->bDynamic)
+                        nbDynamic++;
+                    else
+                        nbStatic++;
+                }
+            }
+
+            if (ig::Begin("Sound Debug", nullptr, ImGuiWindowFlags_None))
+            {
+                ig::SetWindowSize(ImVec2(1200, 600), ImGuiCond_FirstUseEver);
+                ig::SetWindowPos(ImVec2(50, 50), ImGuiCond_FirstUseEver);
+
+                // ListenerInfo
+                ig::TextColored(ImVec4(0, 0.5f, 0.8f, 1), "Listener Info");
+                ig::Separator();
+
+                if (ig::BeginTable("ListenerInfo", 4, ImGuiTableFlags_Borders))
+                {
+                    ig::TableSetupColumn("Sources (sta / dyn)", ImGuiTableColumnFlags_WidthFixed, 180.0f);
+                    ig::TableSetupColumn("# Gr", ImGuiTableColumnFlags_WidthFixed, 60.0f);
+                    ig::TableSetupColumn("# Vol", ImGuiTableColumnFlags_WidthFixed, 60.0f);
+                    ig::TableSetupColumn("Listener Volumes", ImGuiTableColumnFlags_WidthStretch);
+                    ig::TableHeadersRow();
+
+                    ig::TableNextRow();
+
+                    ig::TableSetColumnIndex(0);
+                    ig::Text("%d (%d / %d)", nbDynamic + nbStatic, nbStatic, nbDynamic);
+
+                    ig::TableSetColumnIndex(1);
+                    ig::Text("%d", envmang->ActiveGroups.size());
+
+                    ig::TableSetColumnIndex(2);
+                    ig::Text("%d", envmang->AllVolumes.size());
+
+                    ig::TableSetColumnIndex(3);
+                    {
+                        char listenerVolumesStr[2048] = "[none]";
+                        int offset = 0;
+
+                        for (int i = 0; i < envmang->ListenerVolumes.size(); i++)
+                        {
+                            int nbConnections = 0;
+                            int nbConnectors = 0;
+
+                            for (int j = 0; j < envmang->ListenerVolumes[i]->Connections.size(); j++)
+                            {
+                                UOLSoundConnectorComponent* connector = envmang->ListenerVolumes[i]->Connections[j];
+                                if (connector)
+                                {
+                                    nbConnectors++;
+                                    nbConnections += connector->ConnectedVolumes.size() - 1;
+                                }
+                            }
+
+                            const char* prioStr = "";
+                            switch (envmang->ListenerVolumes[i]->Priority)
+                            {
+                            case 0:  prioStr = "VeryLow, "; break;
+                            case 1:  prioStr = "Low, "; break;
+                            case 2:  prioStr = "High, "; break;
+                            case 3:  prioStr = "VeryHigh, "; break;
+                            default: prioStr = ""; break;
+                            }
+
+                            const char* volName = envmang->ListenerVolumes[i]->GetName().c_str();
+
+                            if (i == 0)
+                            {
+                                offset = sprintf_s(listenerVolumesStr, sizeof(listenerVolumesStr),
+                                    "%s [%s%d connectors to %d volumes]",
+                                    volName, prioStr, nbConnectors, nbConnections);
+                            }
+                            else
+                            {
+                                offset += sprintf_s(listenerVolumesStr + offset, sizeof(listenerVolumesStr) - offset,
+                                    ", %s [%s%d -> %d]",
+                                    volName, prioStr, nbConnectors, nbConnections);
+                            }
+                        }
+
+                        // Обрезаем длинную строку
+                        if (strlen(listenerVolumesStr) > 200)
+                        {
+                            listenerVolumesStr[200] = '\0';
+                            strcat_s(listenerVolumesStr, "...");
+                        }
+                        ig::Text("%s", listenerVolumesStr);
+                    }
+
+                    ig::EndTable();
+                }
+
+                ig::Spacing();
+
+                // ===== Audio Sources =====
+                ig::TextColored(ImVec4(0, 0.5f, 0.8f, 1), "Audio Sources");
+                ig::Separator();
+
+
+                // Таблица с источниками звука
+                if (ig::BeginTable("SoundSources", 9,
+                    ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg |
+                    ImGuiTableFlags_ScrollY | ImGuiTableFlags_Resizable))
+                {
+                    ig::TableSetupColumn("Dist (m)", ImGuiTableColumnFlags_WidthFixed, 80.0f);
+                    ig::TableSetupColumn("Source", ImGuiTableColumnFlags_WidthStretch);
+                    ig::TableSetupColumn("Occl.", ImGuiTableColumnFlags_WidthFixed, 60.0f);
+                    ig::TableSetupColumn("Obst.", ImGuiTableColumnFlags_WidthFixed, 60.0f);
+                    ig::TableSetupColumn("Vir", ImGuiTableColumnFlags_WidthFixed, 40.0f);
+                    ig::TableSetupColumn("Det", ImGuiTableColumnFlags_WidthFixed, 50.0f);
+                    ig::TableSetupColumn("Gr", ImGuiTableColumnFlags_WidthFixed, 40.0f);
+                    ig::TableSetupColumn("Reverb A", ImGuiTableColumnFlags_WidthFixed, 200.0f);
+                    ig::TableSetupColumn("Reverb B", ImGuiTableColumnFlags_WidthFixed, 200.0f);
+                    ig::TableHeadersRow();
+
+                    int nbFiltered = 0;
+                    int nbShown = 0;
+
+                    const char* debugFilter = "";
+                    if (OLCM)
+                        debugFilter = OLCM->DebugSoundEnvFilter.ToString().c_str();
+
+                    for (int i = 0; i < SortedSources.size(); i++)
+                    {
+                        UOLSoundEmitter* sndSrc = SortedSources[i];
+                        if (!sndSrc || !sndSrc->Actor)
+                            continue;
+
+                        const char* actorName = sndSrc->Actor->GetName().c_str();
+                        char audioSrcName[512];
+                        strcpy_s(audioSrcName, actorName);
+
+                        AOLAmbientSound* ambientSound = static_cast<AOLAmbientSound*>(sndSrc->Actor);
+                        if (ambientSound && ambientSound->PlayEvent)
+                        {
+                            char temp[256];
+                            sprintf_s(temp, " [%s]", ambientSound->PlayEvent->GetName());
+                            strcat_s(audioSrcName, temp);
+                        }
+
+                        AOLAmbientSoundClone* ambientSoundClone = static_cast<AOLAmbientSoundClone*>(sndSrc->Actor);
+                        if (ambientSoundClone && ambientSoundClone->Master && ambientSoundClone->Master->PlayEvent)
+                        {
+                            char temp[256];
+                            sprintf_s(temp, " [%s]", ambientSoundClone->Master->PlayEvent->GetName());
+                            strcat_s(audioSrcName, temp);
+                        }
+
+                        AOLSoundEmittingMeshActor* emittingMesh = static_cast<AOLSoundEmittingMeshActor*>(sndSrc->Actor);
+                        if (emittingMesh && emittingMesh->PlayEvent)
+                        {
+                            char temp[256];
+                            sprintf_s(temp, " [%s]", emittingMesh->PlayEvent->GetName());
+                            strcat_s(audioSrcName, temp);
+                        }
+
+                        if (debugFilter && strlen(debugFilter) > 0)
+                        {
+                            if (debugFilter[0] == '-')
+                            {
+                                const char* filter = debugFilter + 1;
+                                if (strstr(audioSrcName, filter) != nullptr)
+                                {
+                                    nbFiltered++;
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                if (strstr(audioSrcName, debugFilter) == nullptr)
+                                {
+                                    nbFiltered++;
+                                    continue;
+                                }
+                            }
+                        }
+
+                        nbShown++;
+
+                        if (nbShown > 500)
+                        {
+                            ig::TableNextRow();
+                            ig::TableSetColumnIndex(0);
+                            ig::TextColored(ImVec4(1, 0.5f, 0, 1), "... and more (limit 500)");
+                            break;
+                        }
+
+                        ig::TableNextRow();
+
+                        // Dist
+                        ig::TableSetColumnIndex(0);
+                        float dist = 0.01f * sndSrc->DebugInfo.DirectDistToListener;
+                        if (fabs(sndSrc->DebugInfo.MicrophoneDistanceFactor - 1.0f) > 0.01f)
+                        {
+                            float distFactor = dist * sndSrc->DebugInfo.MicrophoneDistanceFactor;
+                            ig::Text("%3.1f (%3.1f)", dist, distFactor);
+                        }
+                        else
+                        {
+                            ig::Text("%3.1f", dist);
+                        }
+
+                        // Source Name
+                        ig::TableSetColumnIndex(1);
+                        if (!sndSrc->bActive || sndSrc->UpdateDetail == 0)
+                        {
+                            ig::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1), "%s", audioSrcName);
+                        }
+                        else if (sndSrc->bConnectedToListener)
+                        {
+                            ig::TextColored(ImVec4(0.75f, 0.94f, 1.0f, 1), "%s", audioSrcName);
+                        }
+                        else
+                        {
+                            ig::Text("%s", audioSrcName);
+                        }
+
+                        // Occlusion
+                        ig::TableSetColumnIndex(2);
+                        if (fabs(sndSrc->CurrentOcclusion - sndSrc->TargetOcclusion) > 0.0001f)
+                        {
+                            ig::TextColored(ImVec4(1, 0.6f, 0.13f, 1), "%.0f%%", 100.0f * sndSrc->CurrentOcclusion);
+                        }
+                        else
+                        {
+                            ig::Text("%.0f%%", 100.0f * sndSrc->CurrentOcclusion);
+                        }
+
+                        // Obstruction
+                        ig::TableSetColumnIndex(3);
+                        if (fabs(sndSrc->CurrentObstruction - sndSrc->TargetObstruction) > 0.0001f)
+                        {
+                            ig::TextColored(ImVec4(1, 0.6f, 0.13f, 1), "%.0f%%", 100.0f * sndSrc->CurrentObstruction);
+                        }
+                        else
+                        {
+                            ig::Text("%.0f%%", 100.0f * sndSrc->CurrentObstruction);
+                        }
+
+                        // Virtualized
+                        ig::TableSetColumnIndex(4);
+                        if (sndSrc->bVirtualized)
+                        {
+                            ig::TextColored(ImVec4(0.4f, 0.85f, 1.0f, 1), "Y");
+                        }
+                        else if (sndSrc->bAllowVirtualization)
+                        {
+                            ig::Text("N");
+                        }
+                        else
+                        {
+                            ig::Text("-");
+                        }
+
+                        // Detail
+                        ig::TableSetColumnIndex(5);
+                        switch (sndSrc->UpdateDetail)
+                        {
+                        case 3: ig::Text("High"); break;
+                        case 2: ig::Text("Med"); break;
+                        case 1: ig::Text("Low"); break;
+                        case 0: ig::Text("Irr"); break;
+                        default: ig::Text("?"); break;
+                        }
+
+                        // Group
+                        ig::TableSetColumnIndex(6);
+                        if (sndSrc->bInMultiPositionGroup)
+                        {
+                            int groupIdx = -1;
+                            for (int j = 0; j < envmang->ActiveGroups.size(); j++)
+                            {
+                                FMultiPositionGroup& group = envmang->ActiveGroups[j];
+                                for (int k = 0; k < group.Members.size(); k++)
+                                {
+                                    if (group.Members[k] == sndSrc)
+                                    {
+                                        groupIdx = j;
+                                        break;
+                                    }
+                                }
+                                if (groupIdx != -1) break;
+                            }
+
+                            if (sndSrc->bGroupMaster)
+                            {
+                                ig::Text("M%d", groupIdx + 1);
+                            }
+                            else if (sndSrc->bInMultiPositionGroup)
+                            {
+                                ig::TextColored(ImVec4(0.95f, 1.0f, 0.4f, 1), "C%d", groupIdx + 1);
+                            }
+                        }
+                        else
+                        {
+                            ig::Text("-");
+                        }
+
+                        // Reverb A
+                        ig::TableSetColumnIndex(7);
+                        if (sndSrc->DebugInfo.ReverbAContrib > 0.01f)
+                        {
+                            const char* reverbA = sndSrc->DebugInfo.ReverbA.ToString().c_str();
+                            if (sndSrc->DebugInfo.ReverbAContrib < 0.99f)
+                            {
+                                ig::Text("%s [%.0f%%]", reverbA, 100.0f * sndSrc->DebugInfo.ReverbAContrib);
+                            }
+                            else
+                            {
+                                ig::Text("%s", reverbA);
+                            }
+                        }
+                        else
+                        {
+                            ig::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1), "[none]");
+                        }
+
+                        // Reverb B
+                        ig::TableSetColumnIndex(8);
+                        if (sndSrc->DebugInfo.ReverbBContrib > 0.01f)
+                        {
+                            const char* reverbB = sndSrc->DebugInfo.ReverbB.ToString().c_str();
+                            if (sndSrc->DebugInfo.ReverbBContrib < 0.99f)
+                            {
+                                ig::Text("%s [%.0f%%]", reverbB, 100.0f * sndSrc->DebugInfo.ReverbBContrib);
+                            }
+                            else
+                            {
+                                ig::Text("%s", reverbB);
+                            }
+                        }
+                    }
+
+                    ig::EndTable();
+                }
+
+                //if (nbFiltered > 0)
+                //{
+                //    ig::TextColored(ImVec4(1, 0.5f, 0, 1), "Filtered: %d sources", nbFiltered);
+                //}
+            }
+
+            ig::End();
+        }  */
 
         //OVERLAY
         if (bOverlay) {
@@ -241,12 +612,15 @@ namespace Menu {
               ig::Checkbox("W2S", &W2S);
               ig::Checkbox("DebugVO", &bShowVoiceManager);
 
-              if (OLCM && OLPC) {
-                  if (ig::Button("Change Viewmode", sz)) {
-                      if (!OLCM->IsViewModeUnlit())
-                          OLCM->ViewUnlit();
-                      else if (OLCM->IsViewModeUnlit())
-                          OLCM->ViewLit();
+              if (OLCM && OLPC) {          
+                  if (ig::Combo("View Mode", &viewModeIndex, viewModes, IM_ARRAYSIZE(viewModes))) {
+                      switch (viewModeIndex) {
+                      case 0: OLCM->ViewLit(); break;
+                      case 1: OLCM->ViewUnlit(); break;
+                      case 2: OLCM->ViewWireframe(); break;
+                      case 3: OLCM->ViewDetailLighting(); break;
+                      case 4: OLCM->ViewShaderComplexity(); break;
+                      }
                   }
 
                   if (ig::Button("God", sz)) {

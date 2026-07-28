@@ -36,7 +36,7 @@ namespace Menu {
     void AddText(std::string Text, FVector2D Position, bool WithIcon) {
         ig::GetBackgroundDrawList()->AddText(ImVec2(Position.X - (ig::CalcTextSize((const char*)Text.c_str()).x / 2), Position.Y + (0)), ig::ColorConvertFloat4ToU32(ImVec4(1,1,1,1)), (const char*)Text.c_str());
     }
-
+    
     bool WorldToScreen(APlayerController* pPC, const FVector& WorldLocation, FVector2D& ScreenLocation)
     { /*
         if (!pPC)
@@ -100,6 +100,7 @@ namespace Menu {
     bool IsInPauseMenu() {
         return OLPC && OLPC->HUD && OLPC->HUD->eventIsInPauseMenu();
     }
+
 
     //bool IsValid(UObject* obj)
     //{

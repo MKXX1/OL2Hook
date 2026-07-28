@@ -15,7 +15,7 @@
     <ClCompile Include="src\dependencies\minhook\trampoline.c" />
     <ClCompile Include="src\hooks\backend\dx11\hook_directx11.cpp" />
     <ClCompile Include="src\dependencies\imgui\imgui_impl_dx11.cpp" />
-    <ClCompile Include="src\menu\menu.cpp" />
+    <ClCompile Include="src\menu\Menu.cpp" />
     <ClCompile Include="src\OL2SDK\GameDefines.cpp" />
     <ClCompile Include="src\OL2SDK\SDK_HEADERS\Core_classes.cpp" />
     <ClCompile Include="src\OL2SDK\SDK_HEADERS\Engine_classes.cpp" />
@@ -41,7 +41,7 @@
     <ClInclude Include="src\dependencies\minhook\trampoline.h" />
     <ClInclude Include="src\hooks\backend\dx11\hook_directx11.hpp" />
     <ClInclude Include="src\dependencies\imgui\imgui_impl_dx11.h" />
-    <ClInclude Include="src\menu\menu.hpp" />
+    <ClInclude Include="src\menu\Menu.hpp" />
     <ClInclude Include="src\OL2SDK\GameDefines.hpp" />
     <ClInclude Include="src\OL2SDK\SdkConstants.hpp" />
     <ClInclude Include="src\OL2SDK\SdkHeaders.hpp" />

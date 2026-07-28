@@ -33,21 +33,29 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
     return TRUE;
 }
 
-DWORD WINAPI HooksThread(LPVOID lpParam) {
-    LOG("[+] SDK is ready, initializing hooks\n");
-    MH_Initialize( );
-    H::Init( );
+//DWORD WINAPI HooksThread(LPVOID lpParam) {
+//    LOG("[+] SDK is ready, initializing hooks\n");
+//    MH_Initialize( );
+//    H::Init( );
+//
+//    return 0;
+//}
 
-    return 0;
-}
 DWORD WINAPI OnProcessAttach(LPVOID lpParam) {
     Console::Alloc( );
-    LOG("[+] Attaching\n");
+    LOG("[+] Rendering backend: %s\n", U::RenderingBackendToStr());
+    if (U::GetRenderingBackend() == NONE) {
+        LOG("[!] Looks like you forgot to set a backend. Will unload after pressing enter...");
+        std::cin.get();
 
+        FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(lpParam), 0);
+        return 0;
+    }
 
     InitializeSdk( );
-
-    CreateThread(NULL, 0, HooksThread, NULL, 0, NULL);
+    MH_Initialize();
+    H::Init();
+   // CreateThread(NULL, 0, HooksThread, NULL, 0, NULL);
 
     return 0;
 }

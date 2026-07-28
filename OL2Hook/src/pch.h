@@ -1,5 +1,6 @@
 #pragma once
 #include <thread>
+#include <iostream>
 #include <mutex>
 #include <atomic>
 #include <vector>
@@ -11,11 +12,10 @@
 #include "OL2SDK/SdkHeaders.hpp"
 
 // MAIN
-#include "menu/menu.hpp"
+#include "menu/Menu.hpp"
 #include "menu/MenuUtils.hpp"
 
 // OTHERS
-#define ENABLE_BACKEND_DX11
 #include "utils/utils.hpp"
 
 
